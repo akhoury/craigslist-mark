@@ -1,0 +1,26 @@
+{{#if mode == "single"}}
+    <style>
+        #{{uuid}} {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 3px;
+            z-index: {{ MAX_INT }};
+        }
+    </style>
+    <div id="{{ uuid }}">
+        {{#if item.remote.sold}}
+            <div>
+                {{#if item.local.sold}}
+                    You and {{item.remote.sold - 1}} others marked this item as sold.
+                    <button on-click="onUnmarkAsSold">Undo</button>
+                {{else}}
+                    {{item.remote.sold > 1 ? item.remote.sold + ' people' : '1 person'}} marked this item as sold.
+                    <button on-click="onMarkAsSold">Mark as sold</button>
+                {{/if}}
+            </div>
+         {{else}}
+            <button on-click="onMarkAsSold">Mark as sold</button>
+         {{/if}}
+    </div>
+{{/if}}

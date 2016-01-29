@@ -4,10 +4,12 @@
     var single;
     var body = document.body;
     var API_HOST = '<%= api %>';
+    var MAX_INT = -1 >>> 1;
+    var view;
 
     var top = document.createElement('div');
-    top.setAttribute('style', 'color:red;position:fixed;top:3em;right:0;padding:3px;text-align:right;z-index:' + (-1 >>> 1));
     body.appendChild(top);
+
     var replyLink = document.getElementById("replylink");
 
     if (/^\/search/.test(location.pathname)) {
@@ -15,7 +17,6 @@
     } else if (replyLink) {
         route = "single";
     }
-
     switch (route) {
         case "multiple":
             multiple = true;
@@ -30,10 +31,38 @@
     function onSingle () {
         var id = replyLink.pathname.split('/').pop();
         getItem(id, function(data) {
-            if (data && data.sold) {
-                labelAsSold(id, data.sold);
-            }
-            addSoldButton(id);
+            view = new Ractive({
+                el: top,
+                template: CLMARK.templates.main.template,
+                data: {
+                    uuid: generateUUID('single'),
+                    mode: 'single',
+                    MAX_INT: MAX_INT,
+                    item: {
+                        id: id,
+                        remote: data.remote,
+                        local: data.local
+                    }
+                },
+                oncomplete: function () {
+                    this.on({
+                        onMarkAsSold: this.markAsSold.bind(this),
+                        onUnmarkAsSold: this.unmarkAsSold.bind(this)
+                    });
+                },
+
+                markAsSold: function () {
+                    setItem(this.get('item.id'), {sold: true}, function(data) {
+                        this.set({local: data.local, remote: data.remote});
+                    }.bind(this));
+                },
+
+                unmarkAsSold: function () {
+                    setItem(this.get('item.id'), {sold: false}, function(data) {
+                        this.set({local: data.local, remote: data.remote});
+                    }.bind(this));
+                }
+            });
         });
     }
 
@@ -41,57 +70,17 @@
 
     }
 
-    function addSoldButton (id) {
-        var btn = document.createElement('button');
-        btn.onclick = function () {
-            markAsSold(id);
-            labelAsSold(id);
-        };
-        btn.innerText = 'Mark as sold';
-        top.appendChild(btn);
-    }
-
-
-    function labelAsSold (id, count) {
-        if (single) {
-            var text = document.createElement('div');
-            text.innerHTML = 'this item was marked sold ' + count + ' times.';
-            var btn = document.createElement('button');
-            btn.innerText = 'Undo';
-            btn.onclick = function () {
-                markAsUnsold(id);
-                labelAsUnsold(id);
-            };
-            top.appendChild(text);
-            top.appendChild(btn);
-        } else if (multiple) {
-
-        }
-    }
-
-    function labelAsUnsold (id) {
-        if (single) {
-            addSoldButton(id);
-        } else if (multiple) {
-
-        }
-    }
-    function markAsSold (id) {
-        data[id] = data[id] || {};
-        data[id].sold = true;
-        return setItem(id, data[id], callback);
-    }
-    function markAsUnsold (id, callback) {
-        data[id] = data[id] || {};
-        data[id].sold = false;
-        return setItem(id, data[id], callback);
-    }
-
     function getItem (id, callback) {
-        request(API_HOST + '/' + id, {type: 'GET'}, callback);
+        request(API_HOST + '/' + id, {type: 'GET'}, function(data) {
+            callback && callback({remote: data, local: getLocalItem(id)});
+        });
     }
+
     function setItem (id, data, callback) {
-        request(API_HOST + '/' + id, {type: 'GET', data: data}, callback);
+        request(API_HOST + '/' + id, {type: 'POST', data: data}, function() {
+            setLocalItem(id, data);
+            getItem(id, callback);
+        });
     }
 
     function request (url, options, callback) {
@@ -112,7 +101,8 @@
         };
         xhr.open(options.type, url, true);
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xhr.send(toParam(options.data));
+        xhr.send(options.data ? toParam(options.data) : undefined);
+
     }
 
     function toParam (hash) {
@@ -121,5 +111,27 @@
             str += k + "=" + hash[k];
         });
         return str;
+    }
+
+    function getLocalItem (id) {
+        var data = {};
+        try {
+            data = JSON.parse(localStorage.getItem(API_HOST + '_' + id));
+        } catch (e) {}
+        return data;
+    }
+
+    function setLocalItem (id, data) {
+        localStorage.setItem(API_HOST + '_' + id, JSON.stringify(data));
+        return getLocalItem(id);
+    }
+
+    function generateUUID (prefix) {
+        /*! http://stackoverflow.com/a/2117523/369724 CC BY-SA 2.5 */
+        return (prefix + '') + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0,
+                    v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
     }
 })();
