@@ -14795,7 +14795,7 @@ var templates = {
         getItem(id, function(data) {
             view = new Ractive({
                 el: top,
-                template: CLMARK.templates.main.template,
+                template: CLMARK.templates.main.extension,
                 data: {
                     uuid: generateUUID('single'),
                     mode: 'single',

@@ -67,8 +67,8 @@ module.exports = function(grunt) {
         },
 
         watch: {
-            files: ['<%= concat.main.src %>'],
-            tasks: ['default']
+            files: ['<%= concat.main.src %>', 'src/client/site.html'],
+            tasks: ['dev']
         }
     });
 
@@ -81,7 +81,7 @@ module.exports = function(grunt) {
 
         var zip = new AdmZip();
         zip.addLocalFolder(path.join(__dirname, 'build/browser-extensions/chrome'));
-        zip.writeZip(path.join(__dirname, 'build/browser-extensions/chrome.zip')) ;
+        zip.writeZip(path.join(__dirname, 'build/browser-extensions/' + pkg.name + '-chrome.zip')) ;
     });
 
     grunt.loadNpmTasks("grunt-ractive-parse");
@@ -92,6 +92,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
 
-    grunt.registerTask('dev', ['clean:main', 'ractiveparse', 'concat', 'copy:client_unminified', 'copy:extension_chrome', 'copy:extension_chrome_client', 'build_extension_chrome', 'copy:site', 'clean:after']);
+    grunt.registerTask('dev', ['clean:main', 'ractiveparse', 'concat', 'copy:client_unminified', 'copy:extension_chrome', 'copy:extension_chrome_client', 'build_extension_chrome', 'copy:site']);
     grunt.registerTask('default', ['clean:main', 'ractiveparse', 'concat', 'uglify', 'copy:extension_chrome', 'copy:extension_chrome_client', 'build_extension_chrome', 'copy:site', 'clean:after']);
 };

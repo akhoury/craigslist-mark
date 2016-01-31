@@ -2,23 +2,24 @@
 
 A browser-extension that lets you mark items as sold because craigslisters are assholes and they don't remove their posts after the sale.
 
-## install
+## Installation
 
-### chrome
+### on Chrome
 
-it's not published in the chrome store yet, so ..
+it's not published in the chrome extensions store yet, so ..
 
-1. Download the zipped master [craigslist-mark-master](https://github.com/akhoury/craigslist-mark/archive/master.zip)
+1. Download [chrome.zip](https://github.com/akhoury/craigslist-mark/raw/master/build/browser-extensions/craigslist-mark-chrome.zip)
+2. Extract it somewhere.
 2. in Chrome, click on the meny button, ![chrome-menu-button](https://cloud.githubusercontent.com/assets/1398375/12699998/64676ae4-c79f-11e5-9dea-7bcd192f06d4.png), then Settings > Extensions
 3. Check __"Developer mode"__ box on the top right
-4. Then __"Load Unpacked extension"__ then browse to `~/Downloads/craigslist-mark-master/build/browser-extensions/chrome`
+4. Then __"Load Unpacked extension"__ then browse to `~/Downloads/craigslist-mark-chrome`
 
-### other browsers?
+### Other browsers?
 
 .. well, not yet. it's should be pretty easy to write extensions for the other browsers, since they all can use the same client-side code.
 
 
-## development
+## Development
 
 ### setup mysql db
 

@@ -1,4 +1,6 @@
 var db = require('./database');
+var path = require('path')
+var url = require('url')
 
 var express = require('express');
 var app = express();
@@ -24,7 +26,23 @@ app.use(function(req, res, next) {
 app.get('/:pid', function (req, res) {
     db.getMark(req.params.pid, function(err, data) {
         if (err) {
-            return res.send({});
+            return res.status(400).send(err);
+        }
+        res.send(data);
+    });
+});
+
+app.get('/link/:link', function (req, res) {
+    var link = decodeURIComponent(req.params.link);
+    var anchor = url.parse(link);
+    var pid = ((anchor.pathname || '').split('/').pop() || '').replace(/\.html$/, '');
+    if (!pid) {
+        return res.status(400).send({message: "Url doesn't look valid."});
+    }
+
+    db.getMark(pid, function(err, data) {
+        if (err) {
+            return res.status(400).send(err);
         }
         res.send(data);
     });
@@ -47,6 +65,11 @@ app.post('/:pid', function (req, res) {
         }
     });
 });
+
+app.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, '../../build/index.html'));
+});
+
 
 var port = process.env.NODE_CLM_PORT || 3000;
 

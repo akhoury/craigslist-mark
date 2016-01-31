@@ -2,36 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale = 1.0,maximum-scale = 1, width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
         body {
             background: #bababa;
         }
         .content {
-            width: 75%;
+            width: 90%;
             margin: 2em auto;
         }
+        #result {
+            padding: 10px;
+            font-size: 18px;
+            margin: 10px 0;
+        }
     </style>
-    <title>Craigslist Mark</title>
+    <title>CL Mark</title>
     <script src="//code.jquery.com/jquery-1.12.0.js"></script>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.1/moment.min.js"></script>
 </head>
 <body>
-<div class="content">
-    <h1>TO DO</h1>
-
+<div class="content container-fluid">
     <h1>Craigslist Mark</h1>
-    <blockquote>because craigslisters are assholes.</blockquote>
+    <p><i>because craigslisters are assholes.</i></p>
+
     <div>
-        <div>is this item was marked as sold?</div>
-        <input id="clPostUrl" type="text" placeholder="Paste your craigslist item url here"/> <button id="check">Check</button>
-        <div id="result"></div>
+        <div class="form">
+            <div class="form-group">
+                <input type="text" class="form-control" id="link" placeholder="http://boston.craigslist.org/nos/cto/123456789.html">
+            </div>
+            <button id="check" class="btn btn-default pull-right">Check if post was marked as sold</button>
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+    <div id="result" class="text-center"></div>
+
+    <br>
+    <div class="text-center">
+        If you want to report items yourself, get the Chrome Extension, <a target="_blank" href="https://github.com/akhoury/craigslist-mark#chrome">here</a>
     </div>
 
-    <div>Download the Chrome Extension, and here's some instructions to install it.</div>
-
     <script>
+        $(function() {
+            var $check = $('#check');
+            var $link = $('#link');
+            var $result = $('#result');
+
+            $check.on('click', function() {
+                var link = $link.val();
+                $result.removeClass("bg-success bg-info bg-warning bg-danger").empty();
+
+                if (!link) {
+                    return $result.addClass("bg-warning").text("did you enter a url?");
+                }
+
+                var a = document.createElement('a');
+                a.href = link;
+                if (! /craigslist.org$/.test(a.hostname)) {
+                    return $result.addClass("bg-warning").text("You url doesn't look like a craigslist url at all.");
+                }
+                if (! /\d\.html$/.test(a.pathname)) {
+                    return $result.addClass("bg-warning").text("You url doesn't look like a craigslist post url");
+                }
+                var pid = ((a.pathname || '').split('/').pop() || '').replace(/\.html$/, '');
+                if (!pid) {
+                    return $result.addClass("bg-warning").text("You url doesn't look right. I don't know, I give up.");
+                }
+
+                $.get('/' + pid)
+                        .done(function(data) {
+                            if (data.sold > 0) {
+                                $result.addClass("bg-info").text('Yup, ' + (data.sold > 1 ? data.sold + ' people' : '1 person' ) + ' reported this item as sold, last updated ' + moment(data.updated).fromNow());
+                            } else {
+                                $result.addClass("bg-success").text('Nope, no one reported this one as sold.');
+                            }
+                        })
+                        .fail(function() {
+                            $result.addClass("bg-danger").text('something went wrong :(, I guess you gotta take your chances on that one.');
+                        });
+            });
+        });
 
     </script>
+
+    <a href="https://github.com/akhoury/craigslist-mark"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 </div>
 </body>
 </html>
