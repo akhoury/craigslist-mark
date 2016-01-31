@@ -13,7 +13,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static('../dist/public'));
+app.use(express.static('../../build'));
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");

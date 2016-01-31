@@ -9,14 +9,13 @@ A browser-extension that lets you mark items as sold because craigslisters are a
 it's not published in the chrome store yet, so ..
 
 1. Download the zipped master [craigslist-mark-master](https://github.com/akhoury/craigslist-mark/archive/master.zip)
-2. Extract it
 2. in Chrome, click on the meny button, ![chrome-menu-button](https://cloud.githubusercontent.com/assets/1398375/12699998/64676ae4-c79f-11e5-9dea-7bcd192f06d4.png), then Settings > Extensions
 3. Check __"Developer mode"__ box on the top right
 4. Then __"Load Unpacked extension"__ then browse to `~/Downloads/craigslist-mark-master/build/browser-extensions/chrome`
 
 ### other browsers?
 
-.. well, not yet. it's should be pretty easy to write extensions for the other browsers, since they all can use the same client side code.
+.. well, not yet. it's should be pretty easy to write extensions for the other browsers, since they all can use the same client-side code.
 
 
 ## development
@@ -29,7 +28,7 @@ it's not published in the chrome store yet, so ..
 echo "create database craigslist_mark" | mysql -uuser -ppassword
 
 # then create the schema using node
-NODE_CLM_DB_URL=mysql://user:password@localhost/craigslist_mark node server/create-schema.js
+NODE_CLM_DB_URL=mysql://user:password@localhost/craigslist_mark node src/server/create-schema.js
 
 # or you can just do this
 mysql -uuser -ppassword craigslist_mark < server/schema.sql
@@ -51,7 +50,7 @@ NODE_CLM_CAPTCHA_SITE_KEY=your_captcha_public_key NODE_CLM_HOST=http://localhost
 ### run the server
 
 ```
-NODE_CLM_CAPTCHA_SECRET_KEY=your_captcha_secret_key NODE_CLM_DB_URL=mysql://user:password@localhost/craigslist_mark NODE_CLM_PORT=5000 node server/app.js
+NODE_CLM_CAPTCHA_SECRET_KEY=your_captcha_secret_key NODE_CLM_DB_URL=mysql://user:password@localhost/craigslist_mark NODE_CLM_PORT=5000 node src/server/app.js
 ```
 
 #### server run-time env vars

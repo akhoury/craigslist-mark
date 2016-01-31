@@ -1,16 +1,22 @@
+var AdmZip = require('adm-zip');
+var path = require('path');
+
 module.exports = function(grunt) {
     var pkg = require('./package.json');
 
     grunt.initConfig({
-        clean: ["build/public", "build/browser-extensions/chrome/client.min.js"],
+        clean: {
+            main: ["build"],
+            after: ["build/*.mustache.js", "build/browser-extensions/*", "!build/browser-extensions/*.zip"]
+        },
 
         ractiveparse: {
             options: {
                 namespace: 'CLMARK.templates["main"]'
             },
             main: {
-                src: ['client/template.mustache'],
-                dest: 'build/public/template.compiled.js'
+                src: ['src/client/extension.mustache'],
+                dest: 'build/extension.mustache.js'
             }
         },
 
@@ -24,17 +30,39 @@ module.exports = function(grunt) {
                 }
             },
             main: {
-                src: ['build/public/template.compiled.js', 'client/ractive.js', 'client/index.js'],
-                dest: 'build/public/client.js'
+                src: ['build/extension.mustache.js', 'src/client/external/*.js', 'src/client/extension.js'],
+                dest: 'build/extension.js'
             }
         },
 
         uglify: {
             main: {
                 files: {
-                    'build/browser-extensions/chrome/client.min.js': ['build/public/client.js'],
-                    'build/public/client.min.js': ['build/public/client.js']
+                    'build/extension.min.js': ['build/extension.js']
                 }
+            }
+        },
+
+        copy: {
+            'client_unminified': {
+                src: 'build/extension.js',
+                dest: 'build/extension.min.js'
+            },
+            'extension_chrome': {
+                files: [{
+                    expand: true,
+                    flatten: true,
+                    src: 'src/client/browser-extensions/chrome/*',
+                    dest: 'build/browser-extensions/chrome/'
+                }]
+            },
+            'extension_chrome_client': {
+                src: 'build/extension.min.js',
+                dest: 'build/browser-extensions/chrome/extension.min.js'
+            },
+            site: {
+                src: 'src/client/site.html',
+                dest: 'build/index.html'
             }
         },
 
@@ -44,18 +72,26 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('chrome:manifest', 'Write chrome\'s manifest file', function() {
-        var manifest = grunt.file.readJSON('build/browser-extensions/chrome/manifest.json');
+    grunt.registerTask('build_extension_chrome', 'create chrome extension', function() {
+        var manifest = grunt.file.readJSON('src/client/browser-extensions/chrome/manifest.json');
         manifest.description = pkg.description;
         manifest.version = pkg.version;
         manifest.name = pkg.name;
         grunt.file.write('build/browser-extensions/chrome/manifest.json', JSON.stringify(manifest, null, 4));
+
+        var zip = new AdmZip();
+        zip.addLocalFolder(path.join(__dirname, 'build/browser-extensions/chrome'));
+        zip.writeZip(path.join(__dirname, 'build/browser-extensions/chrome.zip')) ;
     });
 
+    grunt.loadNpmTasks("grunt-ractive-parse");
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks("grunt-ractive-parse");
+    grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.registerTask('default', ['clean', 'ractiveparse', 'concat', 'uglify', 'chrome:manifest']);
+    grunt.loadNpmTasks('grunt-contrib-compress');
+
+    grunt.registerTask('dev', ['clean:main', 'ractiveparse', 'concat', 'copy:client_unminified', 'copy:extension_chrome', 'copy:extension_chrome_client', 'build_extension_chrome', 'copy:site', 'clean:after']);
+    grunt.registerTask('default', ['clean:main', 'ractiveparse', 'concat', 'uglify', 'copy:extension_chrome', 'copy:extension_chrome_client', 'build_extension_chrome', 'copy:site', 'clean:after']);
 };

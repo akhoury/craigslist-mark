@@ -1,6 +1,6 @@
 (function() {
     var s = document.createElement('script');
-    s.src = chrome.extension.getURL('client.min.js');
+    s.src = chrome.extension.getURL('extension.min.js');
     s.onload = function() {
         this.parentNode.removeChild(this);
     };
