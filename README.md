@@ -4,10 +4,10 @@ A browser-extension that lets you mark items as sold because craigslisters are a
 
 ## Screenshots
 
-![screen shot 2016-01-31 at 1 39 45 am](https://cloud.githubusercontent.com/assets/1398375/12700706/c5d26646-c7bb-11e5-815f-e51df965281f.png)
-![screen shot 2016-01-31 at 1 40 09 am](https://cloud.githubusercontent.com/assets/1398375/12700707/c5db328a-c7bb-11e5-8518-dae8dc35190d.png)
 ![screen shot 2016-01-31 at 1 40 37 am](https://cloud.githubusercontent.com/assets/1398375/12700708/c5de5820-c7bb-11e5-8f2d-ae7a07a9198a.png)
 ![screen shot 2016-01-31 at 1 40 51 am](https://cloud.githubusercontent.com/assets/1398375/12700709/c5dee8ee-c7bb-11e5-8e32-f5855656b523.png)
+![screen shot 2016-01-31 at 1 40 09 am](https://cloud.githubusercontent.com/assets/1398375/12700707/c5db328a-c7bb-11e5-8518-dae8dc35190d.png)
+![screen shot 2016-01-31 at 1 39 45 am](https://cloud.githubusercontent.com/assets/1398375/12700706/c5d26646-c7bb-11e5-815f-e51df965281f.png)
 
 ## Installation
 
