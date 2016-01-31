@@ -8,7 +8,7 @@ A browser-extension that lets you mark items as sold because craigslisters are a
 
 it's not published in the chrome extensions store yet, so ..
 
-1. Download [chrome.zip](https://github.com/akhoury/craigslist-mark/raw/master/build/browser-extensions/craigslist-mark-chrome.zip)
+1. Download [craigslist-mark-chrome.zip](https://github.com/akhoury/craigslist-mark/raw/master/build/browser-extensions/craigslist-mark-chrome.zip)
 2. Extract it somewhere.
 2. in Chrome, click on the meny button, ![chrome-menu-button](https://cloud.githubusercontent.com/assets/1398375/12699998/64676ae4-c79f-11e5-9dea-7bcd192f06d4.png), then Settings > Extensions
 3. Check __"Developer mode"__ box on the top right
