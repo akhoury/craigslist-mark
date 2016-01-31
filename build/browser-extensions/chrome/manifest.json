@@ -14,7 +14,7 @@
         "client.min.js"
     ],
     "manifest_version": 2,
-    "description": "lets you mark items as sold because 'craigslisters' are assholes and they don't remove their posts after the sale.",
+    "description": "lets you mark items as sold because craigslisters are assholes and they don't remove their posts after the sale.",
     "version": "1.0.0",
     "name": "craigslist-mark"
 }

@@ -5,7 +5,7 @@ this["CLMARK"]["templates"]["main"] = this["CLMARK"]["templates"]["main"] || {};
 var templates = {
 
 		templates: {		
-			'template': {"v":1,"t":[{"t":4,"n":50,"x":{"r":["mode"],"s":"_0==\"single\""},"f":[{"t":7,"e":"style","f":["#",{"t":2,"r":"uuid"}," {\n            position: fixed;\n            top: 0;\n            right: 0;\n            padding: 3px;\n            z-index: ",{"t":2,"r":"MAX_INT"},";\n        }"]}," ",{"t":7,"e":"div","a":{"id":[{"t":2,"r":"uuid"}]},"f":[{"t":4,"n":50,"r":"item.remote.sold","f":[{"t":7,"e":"div","f":[{"t":4,"n":50,"r":"item.local.sold","f":["You and ",{"t":2,"x":{"r":["item.remote.sold"],"s":"_0-1"}}," others marked this item as sold. ",{"t":7,"e":"button","v":{"click":"onUnmarkAsSold"},"f":["Undo"]}]},{"t":4,"n":51,"f":[{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?_0+\" people\":\"1 person\""}}," marked this item as sold. ",{"t":7,"e":"button","v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"r":"item.local.sold"}]}]},{"t":4,"n":51,"f":[{"t":7,"e":"button","v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"r":"item.remote.sold"}]}]}]}
+			'template': {"v":1,"t":[{"t":4,"n":50,"x":{"r":["mode"],"s":"_0==\"single\""},"f":[{"t":7,"e":"style","f":["#",{"t":2,"r":"uuid"}," {\n            display: block;\n            clear: both;\n            padding: 0;\n            margin: 0;\n            font-size: 10px;\n            text-align: center;\n            z-index: ",{"t":2,"r":"MAX_INT"},";\n            color: red;\n        }\n        #",{"t":2,"r":"uuid"}," button.undo-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"uuid"}," button.mark-sold-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"uuid"}," .captcha,\n        #",{"t":2,"r":"uuid"}," .captcha div {\n            margin: 0 auto;\n        }"]}," ",{"t":7,"e":"script","a":{"src":["https://www.google.com/recaptcha/api.js?onload=__clm__",{"t":2,"r":"uuid"},"&render=explicit"],"async":0,"defer":0}}," ",{"t":7,"e":"div","a":{"id":[{"t":2,"r":"uuid"}]},"f":[{"t":4,"n":50,"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"},"f":[{"t":7,"e":"div","f":[{"t":4,"n":50,"r":"item.local.sold","f":["You ",{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?\"and \"+((_0-1)>1?(_0-1)+\" others \":\" 1 other person \"):\"\""}},"marked this item as sold. ",{"t":7,"e":"button","a":{"class":"undo-btn"},"v":{"click":"onUnmarkAsSold"},"f":["Undo"]}]},{"t":4,"n":51,"f":[{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?_0+\" people\":\"1 person\""}}," marked this item as sold. ",{"t":7,"e":"button","a":{"class":"mark-sold-btn"},"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"r":"item.local.sold"}]}]},{"t":4,"n":51,"f":[{"t":7,"e":"button","a":{"class":"mark-sold-btn"},"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"}}," ",{"t":7,"e":"div","a":{"class":"captcha","style":[{"t":4,"n":51,"r":"checkingHuman","f":["display: none;"]}]}}]}]}]}
 		}
 
 	};
@@ -14769,7 +14769,8 @@ var templates = {
     var view;
 
     var top = document.createElement('div');
-    body.appendChild(top);
+    var header = document.querySelectorAll('.global-header')[0];
+    header.appendChild(top);
 
     var replyLink = document.getElementById("replylink");
 
@@ -14806,42 +14807,75 @@ var templates = {
                     }
                 },
                 oncomplete: function () {
+                    window['__clm__' + this.get('uuid')] = this.onCaptchaLoad.bind(this);
                     this.on({
                         onMarkAsSold: this.markAsSold.bind(this),
                         onUnmarkAsSold: this.unmarkAsSold.bind(this)
                     });
                 },
 
+                onCaptchaLoad: function () {},
+
+                isHuman: function (callback) {
+                    if (!window.grecaptcha) {
+                        return;
+                    }
+                    this.set('checkingHuman', true);
+                    var newCallback = function (captchaResponse) {
+                        callback && callback(captchaResponse);
+                        this.set('checkingHuman', false);
+                    }.bind(this);
+
+                    var response;
+                    if (this._captchaWidgetId != null) {
+                        try {
+                            response = grecaptcha.getResponse(this._captchaWidgetId);
+                        } catch (e) {}
+                        if (response) {
+                            return newCallback(response);
+                        }
+                    }
+                    var catpchaEl = this.find('.captcha');
+                    catpchaEl.innerHTML = '';
+                    this._captchaWidgetId = grecaptcha.render(catpchaEl, {
+                        sitekey : '6Lew6hYTAAAAAN-t3heO1565atm-CXYHGt7cBXeY',
+                        callback : newCallback
+                    });
+                },
+
                 markAsSold: function () {
-                    debugger;
-                    setItem(this.get('item.id'), {sold: true}, function(data) {
-                        this.set({local: data.local, remote: data.remote});
+                    this.isHuman(function(captchaResponse) {
+                        setItem(this.get('item.id'), {sold: true, captchaResponse: captchaResponse}, function(data) {
+                            this.set({'item.local': data.local, 'item.remote': data.remote});
+                        }.bind(this));
                     }.bind(this));
                 },
 
                 unmarkAsSold: function () {
-                    setItem(this.get('item.id'), {sold: false}, function(data) {
-                        this.set({local: data.local, remote: data.remote});
+                    this.isHuman(function(captchaResponse) {
+                        setItem(this.get('item.id'), {sold: false, captchaResponse: captchaResponse}, function(data) {
+                            this.set({'item.local': data.local, 'item.remote': data.remote});
+                        }.bind(this));
                     }.bind(this));
                 }
             });
         });
     }
 
-    function onMultiple () {
-
-    }
+    function onMultiple () {}
 
     function getItem (id, callback) {
         request(API_HOST + '/' + id, {type: 'GET'}, function(data) {
+            data = JSON.parse(data || "{}");
             callback && callback({remote: data, local: getLocalItem(id)});
         });
     }
 
     function setItem (id, data, callback) {
-        request(API_HOST + '/' + id, {type: 'POST', data: data}, function() {
-            setLocalItem(id, data);
-            getItem(id, callback);
+        request(API_HOST + '/' + id, {type: 'POST', data: data}, function(rdata) {
+            rdata = JSON.parse(rdata);
+            setLocalItem(id, {sold: data.sold});
+            callback && callback({remote: rdata, local: getLocalItem(id)});
         });
     }
 
@@ -14869,8 +14903,8 @@ var templates = {
 
     function toParam (hash) {
         var str = "";
-        Object.keys(hash).forEach(function(k) {
-            str += k + "=" + hash[k];
+        Object.keys(hash).forEach(function(k, i) {
+            str += (i ? '&' : '') + k + "=" + hash[k];
         });
         return str;
     }

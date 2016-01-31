@@ -1,26 +1,42 @@
 {{#if mode == "single"}}
     <style>
         #{{uuid}} {
-            position: fixed;
-            top: 0;
-            right: 0;
-            padding: 3px;
+            display: block;
+            clear: both;
+            padding: 0;
+            margin: 0;
+            font-size: 10px;
+            text-align: center;
             z-index: {{ MAX_INT }};
+            color: red;
+        }
+        #{{uuid}} button.undo-btn {
+            color: black;
+        }
+        #{{uuid}} button.mark-sold-btn {
+            color: black;
+        }
+        #{{uuid}} .captcha,
+        #{{uuid}} .captcha div {
+            margin: 0 auto;
         }
     </style>
+    <script src="https://www.google.com/recaptcha/api.js?onload=__clm__{{uuid}}&render=explicit" async defer></script>
     <div id="{{ uuid }}">
-        {{#if item.remote.sold}}
+
+        {{#if item.local.sold || item.remote.sold > 0}}
             <div>
                 {{#if item.local.sold}}
-                    You and {{item.remote.sold - 1}} others marked this item as sold.
-                    <button on-click="onUnmarkAsSold">Undo</button>
+                    You {{ item.remote.sold > 1 ? 'and ' + ((item.remote.sold - 1) > 1 ? (item.remote.sold - 1) + ' others ': ' 1 other person ') : '' }}marked this item as sold.
+                    <button class="undo-btn" on-click="onUnmarkAsSold">Undo</button>
                 {{else}}
                     {{item.remote.sold > 1 ? item.remote.sold + ' people' : '1 person'}} marked this item as sold.
-                    <button on-click="onMarkAsSold">Mark as sold</button>
+                    <button class="mark-sold-btn" on-click="onMarkAsSold">Mark as sold</button>
                 {{/if}}
             </div>
          {{else}}
-            <button on-click="onMarkAsSold">Mark as sold</button>
+            <button class="mark-sold-btn" on-click="onMarkAsSold">Mark as sold</button>
          {{/if}}
+        <div class="captcha" style="{{#unless checkingHuman}}display: none;{{/unless}}"></div>
     </div>
 {{/if}}

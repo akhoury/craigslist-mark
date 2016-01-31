@@ -8,7 +8,8 @@
     var view;
 
     var top = document.createElement('div');
-    body.appendChild(top);
+    var header = document.querySelectorAll('.global-header')[0];
+    header.appendChild(top);
 
     var replyLink = document.getElementById("replylink");
 
@@ -45,41 +46,75 @@
                     }
                 },
                 oncomplete: function () {
+                    window['__clm__' + this.get('uuid')] = this.onCaptchaLoad.bind(this);
                     this.on({
                         onMarkAsSold: this.markAsSold.bind(this),
                         onUnmarkAsSold: this.unmarkAsSold.bind(this)
                     });
                 },
 
+                onCaptchaLoad: function () {},
+
+                isHuman: function (callback) {
+                    if (!window.grecaptcha) {
+                        return;
+                    }
+                    this.set('checkingHuman', true);
+                    var newCallback = function (captchaResponse) {
+                        callback && callback(captchaResponse);
+                        this.set('checkingHuman', false);
+                    }.bind(this);
+
+                    var response;
+                    if (this._captchaWidgetId != null) {
+                        try {
+                            response = grecaptcha.getResponse(this._captchaWidgetId);
+                        } catch (e) {}
+                        if (response) {
+                            return newCallback(response);
+                        }
+                    }
+                    var catpchaEl = this.find('.captcha');
+                    catpchaEl.innerHTML = '';
+                    this._captchaWidgetId = grecaptcha.render(catpchaEl, {
+                        sitekey : '<%= captchaSiteKey %>',
+                        callback : newCallback
+                    });
+                },
+
                 markAsSold: function () {
-                    setItem(this.get('item.id'), {sold: true}, function(data) {
-                        this.set({local: data.local, remote: data.remote});
+                    this.isHuman(function(captchaResponse) {
+                        setItem(this.get('item.id'), {sold: true, captchaResponse: captchaResponse}, function(data) {
+                            this.set({'item.local': data.local, 'item.remote': data.remote});
+                        }.bind(this));
                     }.bind(this));
                 },
 
                 unmarkAsSold: function () {
-                    setItem(this.get('item.id'), {sold: false}, function(data) {
-                        this.set({local: data.local, remote: data.remote});
+                    this.isHuman(function(captchaResponse) {
+                        setItem(this.get('item.id'), {sold: false, captchaResponse: captchaResponse}, function(data) {
+                            this.set({'item.local': data.local, 'item.remote': data.remote});
+                        }.bind(this));
                     }.bind(this));
                 }
             });
         });
     }
 
-    function onMultiple () {
-
-    }
+    function onMultiple () {}
 
     function getItem (id, callback) {
         request(API_HOST + '/' + id, {type: 'GET'}, function(data) {
+            data = JSON.parse(data || "{}");
             callback && callback({remote: data, local: getLocalItem(id)});
         });
     }
 
     function setItem (id, data, callback) {
-        request(API_HOST + '/' + id, {type: 'POST', data: data}, function() {
-            setLocalItem(id, data);
-            getItem(id, callback);
+        request(API_HOST + '/' + id, {type: 'POST', data: data}, function(rdata) {
+            rdata = JSON.parse(rdata);
+            setLocalItem(id, {sold: data.sold});
+            callback && callback({remote: rdata, local: getLocalItem(id)});
         });
     }
 
@@ -107,8 +142,8 @@
 
     function toParam (hash) {
         var str = "";
-        Object.keys(hash).forEach(function(k) {
-            str += k + "=" + hash[k];
+        Object.keys(hash).forEach(function(k, i) {
+            str += (i ? '&' : '') + k + "=" + hash[k];
         });
         return str;
     }
