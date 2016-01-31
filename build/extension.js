@@ -5,7 +5,7 @@ this["CLMARK"]["templates"]["main"] = this["CLMARK"]["templates"]["main"] || {};
 var templates = {
 
 		templates: {		
-			'extension': {"v":1,"t":[{"t":4,"n":50,"x":{"r":["mode"],"s":"_0==\"single\""},"f":[{"t":7,"e":"style","f":["#",{"t":2,"r":"uuid"}," {\n            display: block;\n            clear: both;\n            padding: 0;\n            margin: 0;\n            font-size: 10px;\n            text-align: center;\n            z-index: ",{"t":2,"r":"MAX_INT"},";\n            color: red;\n        }\n        #",{"t":2,"r":"uuid"}," button.undo-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"uuid"}," button.mark-sold-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"uuid"}," .captcha,\n        #",{"t":2,"r":"uuid"}," .captcha div {\n            margin: 0 auto;\n        }"]}," ",{"t":7,"e":"script","a":{"src":["https://www.google.com/recaptcha/api.js?onload=__clm__",{"t":2,"r":"uuid"},"&render=explicit"],"async":0,"defer":0}}," ",{"t":7,"e":"div","a":{"id":[{"t":2,"r":"uuid"}]},"f":[{"t":4,"n":50,"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"},"f":[{"t":7,"e":"div","f":[{"t":4,"n":50,"r":"item.local.sold","f":["You ",{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?\"and \"+((_0-1)>1?(_0-1)+\" others \":\" 1 other person \"):\"\""}},"marked this item as sold. ",{"t":7,"e":"button","a":{"class":"undo-btn"},"v":{"click":"onUnmarkAsSold"},"f":["Undo"]}]},{"t":4,"n":51,"f":[{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?_0+\" people\":\"1 person\""}}," marked this item as sold. ",{"t":7,"e":"button","a":{"class":"mark-sold-btn"},"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"r":"item.local.sold"}]}]},{"t":4,"n":51,"f":[{"t":7,"e":"button","a":{"class":"mark-sold-btn"},"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"}}," ",{"t":7,"e":"div","a":{"class":"captcha","style":[{"t":4,"n":51,"r":"checkingHuman","f":["display: none;"]}]}}]}]}]}
+			'extension': {"v":1,"t":[{"t":4,"n":50,"x":{"r":["mode"],"s":"_0==\"single\""},"f":[{"t":7,"e":"style","f":["#",{"t":2,"r":"uuid"}," {\n            display: block;\n            clear: both;\n            padding: 0;\n            margin: 0;\n            font-size: 10px;\n            text-align: center;\n            z-index: ",{"t":2,"r":"MAX_INT"},";\n            color: red;\n        }\n        #",{"t":2,"r":"uuid"}," button.undo-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"uuid"}," button.mark-sold-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"uuid"}," .captcha,\n        #",{"t":2,"r":"uuid"}," .captcha div {\n            margin: 0 auto;\n        }"]}," ",{"t":7,"e":"iframe","a":{"src":[{"t":2,"r":"API_HOST"},"/public/cookie.html"]}}," ",{"t":7,"e":"script","a":{"src":["https://www.google.com/recaptcha/api.js?onload=__clm__",{"t":2,"r":"uuid"},"&render=explicit"],"async":0,"defer":0}}," ",{"t":7,"e":"div","a":{"id":[{"t":2,"r":"uuid"}]},"f":[{"t":4,"n":50,"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"},"f":[{"t":7,"e":"div","f":[{"t":4,"n":50,"r":"item.local.sold","f":["You ",{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?\"and \"+((_0-1)>1?(_0-1)+\" others \":\" 1 other person \"):\"\""}},"marked this item as sold. ",{"t":7,"e":"button","a":{"class":"undo-btn"},"v":{"click":"onUnmarkAsSold"},"f":["Undo"]}]},{"t":4,"n":51,"f":[{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?_0+\" people\":\"1 person\""}}," marked this item as sold. ",{"t":7,"e":"button","a":{"class":"mark-sold-btn"},"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"r":"item.local.sold"}]}]},{"t":4,"n":51,"f":[{"t":7,"e":"button","a":{"class":"mark-sold-btn"},"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"}}," ",{"t":7,"e":"div","a":{"class":"captcha","style":[{"t":4,"n":51,"r":"checkingHuman","f":["display: none;"]}]}}]}]}]}
 		}
 
 	};
@@ -14760,6 +14760,42 @@ var templates = {
 
 }( typeof window !== 'undefined' ? window : this ) );
 (function() {
+    if (!window.CLMARK) {
+        window.CLMARK = {};
+    }
+    var CLMARK = window.CLMARK;
+    if (!CLMARK.util) {
+        CLMARK.util = {};
+    }
+    CLMARK.util.generateUUID = function (prefix) {
+        /*! http://stackoverflow.com/a/2117523/369724 CC BY-SA 2.5 */
+        return (prefix + '') + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0,
+                    v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+    };
+    CLMARK.util.ondomready = function (callback) {
+        callback = callback || function(){};
+
+        var complete = function() {
+            if (document.removeEventListener) {
+                document.removeEventListener("DOMContentLoaded", complete, false);
+                callback();
+            } else if (document.readyState === "complete") {
+                document.detachEvent("onreadystatechange", complete);
+                callback();
+            }
+        };
+        if (document.addEventListener) {
+            document.addEventListener( "DOMContentLoaded", complete, false );
+        } else if (document.attachEvent) {
+            document.attachEvent("onreadystatechange", complete);
+        }
+    }
+})();
+(function() {
+
     var route;
     var multiple;
     var single;
@@ -14773,21 +14809,37 @@ var templates = {
     header.appendChild(top);
 
     var replyLink = document.getElementById("replylink");
+    var uuid;
 
-    if (/^\/search/.test(location.pathname)) {
-        route = "multiple"
-    } else if (replyLink) {
-        route = "single";
-    }
-    switch (route) {
-        case "multiple":
-            multiple = true;
-            onMultiple();
-            break;
-        case "single":
-            single = true;
-            onSingle();
-            break;
+    var postMessageRegExp = /^CLMARKUuid:/;
+    var attachEventFn = window.addEventListener ? 'addEventListener' : 'attachEvent';
+    window[attachEventFn](attachEventFn === 'attachEvent' ? 'onmessage' : 'message', function(e) {
+        if (e && e.data && postMessageRegExp.test(e.data)) {
+            var uuid = (e.data || '').split(':')[1];
+            onUuid(uuid)
+        }
+    },false);
+
+    function onUuid (_uuid) {
+        uuid = _uuid;
+
+        console.log("uuid", uuid);
+
+        if (/^\/search/.test(location.pathname)) {
+            route = "multiple"
+        } else if (replyLink) {
+            route = "single";
+        }
+        switch (route) {
+            case "multiple":
+                multiple = true;
+                onMultiple();
+                break;
+            case "single":
+                single = true;
+                onSingle();
+                break;
+        }
     }
 
     function onSingle () {
@@ -14797,9 +14849,10 @@ var templates = {
                 el: top,
                 template: CLMARK.templates.main.extension,
                 data: {
-                    uuid: generateUUID('single'),
-                    mode: 'single',
                     MAX_INT: MAX_INT,
+                    API_HOST: API_HOST,
+                    uuid: uuid,
+                    mode: 'single',
                     item: {
                         id: id,
                         remote: data.remote,
@@ -14838,7 +14891,7 @@ var templates = {
                     var catpchaEl = this.find('.captcha');
                     catpchaEl.innerHTML = '';
                     this._captchaWidgetId = grecaptcha.render(catpchaEl, {
-                        sitekey : '6Lew6hYTAAAAAN-t3heO1565atm-CXYHGt7cBXeY',
+                        sitekey : '',
                         callback : newCallback
                     });
                 },

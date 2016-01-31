@@ -30,7 +30,12 @@ module.exports = function(grunt) {
                 }
             },
             main: {
-                src: ['build/extension.mustache.js', 'src/client/external/*.js', 'src/client/extension.js'],
+                src: [
+                    'build/extension.mustache.js',
+                    'src/client/external/ractive.js',
+                    'src/client/util.js',
+                    'src/client/extension.js'
+                    ],
                 dest: 'build/extension.js'
             }
         },
@@ -38,6 +43,7 @@ module.exports = function(grunt) {
         uglify: {
             main: {
                 files: {
+                    'build/util.min.js': ['src/client/util.js'],
                     'build/extension.min.js': ['build/extension.js']
                 }
             }
@@ -63,6 +69,16 @@ module.exports = function(grunt) {
             site: {
                 src: 'src/client/site.html',
                 dest: 'build/index.html'
+            },
+            evercookie: {
+                expand: true,
+                flatten: true,
+                src: [
+                    'src/client/external/swfobject-2.2.min.js',
+                    'src/client/external/evercookie.js',
+                    'src/client/cookie.html'
+                ],
+                dest: 'build/'
             }
         },
 
@@ -92,6 +108,27 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
 
-    grunt.registerTask('dev', ['clean:main', 'ractiveparse', 'concat', 'copy:client_unminified', 'copy:extension_chrome', 'copy:extension_chrome_client', 'build_extension_chrome', 'copy:site']);
-    grunt.registerTask('default', ['clean:main', 'ractiveparse', 'concat', 'uglify', 'copy:extension_chrome', 'copy:extension_chrome_client', 'build_extension_chrome', 'copy:site', 'clean:after']);
+    grunt.registerTask('dev', [
+        'clean:main',
+        'ractiveparse',
+        'concat',
+        'copy:client_unminified',
+        'copy:extension_chrome',
+        'copy:extension_chrome_client',
+        'build_extension_chrome',
+        'copy:site',
+        'copy:evercookie'
+    ]);
+    grunt.registerTask('default', [
+        'clean:main',
+        'ractiveparse',
+        'concat',
+        'uglify',
+        'copy:extension_chrome',
+        'copy:extension_chrome_client',
+        'build_extension_chrome',
+        'copy:site',
+        'copy:evercookie',
+        'clean:after'
+    ]);
 };

@@ -1,4 +1,5 @@
 (function() {
+
     var route;
     var multiple;
     var single;
@@ -12,21 +13,37 @@
     header.appendChild(top);
 
     var replyLink = document.getElementById("replylink");
+    var uuid;
 
-    if (/^\/search/.test(location.pathname)) {
-        route = "multiple"
-    } else if (replyLink) {
-        route = "single";
-    }
-    switch (route) {
-        case "multiple":
-            multiple = true;
-            onMultiple();
-            break;
-        case "single":
-            single = true;
-            onSingle();
-            break;
+    var postMessageRegExp = /^CLMARKUuid:/;
+    var attachEventFn = window.addEventListener ? 'addEventListener' : 'attachEvent';
+    window[attachEventFn](attachEventFn === 'attachEvent' ? 'onmessage' : 'message', function(e) {
+        if (e && e.data && postMessageRegExp.test(e.data)) {
+            var uuid = (e.data || '').split(':')[1];
+            onUuid(uuid)
+        }
+    },false);
+
+    function onUuid (_uuid) {
+        uuid = _uuid;
+
+        console.log("uuid", uuid);
+
+        if (/^\/search/.test(location.pathname)) {
+            route = "multiple"
+        } else if (replyLink) {
+            route = "single";
+        }
+        switch (route) {
+            case "multiple":
+                multiple = true;
+                onMultiple();
+                break;
+            case "single":
+                single = true;
+                onSingle();
+                break;
+        }
     }
 
     function onSingle () {
@@ -36,9 +53,10 @@
                 el: top,
                 template: CLMARK.templates.main.extension,
                 data: {
-                    uuid: generateUUID('single'),
-                    mode: 'single',
                     MAX_INT: MAX_INT,
+                    API_HOST: API_HOST,
+                    uuid: uuid,
+                    mode: 'single',
                     item: {
                         id: id,
                         remote: data.remote,

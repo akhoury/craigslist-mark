@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script src="/public/swfobject-2.2.min.js"></script>
+    <script src="/public/evercookie.js"></script>
+    <script src="/public/util.min.js"></script>
+</head>
+<script>
+    (function() {
+        CLMARK.util.ondomready(function() {
+            var ec = new evercookie();
+            var uuid;
+            ec.get("uuid", function(best) {
+                uuid = best || CLMARK.util.generateUUID('u');
+                ec.set("uuid", uuid);
+                window.parent.postMessage('CLMARKUuid:' + uuid, '*');
+            });
+        });
+    })();
+</script>
+<body>
+</body>
+</html>

@@ -1,6 +1,6 @@
 var db = require('./database');
-var path = require('path')
-var url = require('url')
+var path = require('path');
+var url = require('url');
 
 var express = require('express');
 var app = express();
@@ -15,7 +15,12 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static('../../build'));
+var evercookie = require('evercookie');
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+app.use(evercookie.backend());
+
+app.use('/public', express.static(path.join(__dirname, '../../build')));
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");

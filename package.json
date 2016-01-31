@@ -18,6 +18,8 @@
   "homepage": "https://github.com/akhoury/craigslist-mark#readme",
   "dependencies": {
     "body-parser": "^1.14.2",
+    "cookie-parser": "^1.4.1",
+    "evercookie": "^0.3.0",
     "express": "^4.13.4",
     "mysql": "^2.10.2",
     "recaptcha-verify": "^0.1.0"
