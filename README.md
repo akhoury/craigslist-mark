@@ -2,7 +2,11 @@
 
 A site and a browser-extension that lets you mark and check items as/if sold, because craigslisters are assholes and they don't remove their posts after the sale.
 
-## Installation
+## Site
+
+Want to quickly check if an item as marked as sold? visit: TBD
+
+## Browser extension installation
 
 ### Chrome
 
@@ -17,10 +21,6 @@ it's not published in the chrome extensions store yet, so ..
 ### Other browsers?
 
 .. well, not yet. it's should be pretty easy to write extensions for the other browsers, since they all can use the same client-side code.
-
-## Site
-
-Want to quickly check if an item as marked as sold? visit: TBD
 
 
 ## Screenshots
