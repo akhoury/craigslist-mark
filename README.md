@@ -1,10 +1,10 @@
 # Craigslist Mark
 
-A browser-extension that lets you mark items as sold because craigslisters are assholes and they don't remove their posts after the sale.
+A site and a browser-extension that lets you mark and check items as/if sold, because craigslisters are assholes and they don't remove their posts after the sale.
 
 ## Installation
 
-### on Chrome
+### Chrome
 
 it's not published in the chrome extensions store yet, so ..
 
