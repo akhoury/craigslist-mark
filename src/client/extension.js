@@ -13,38 +13,50 @@
     header.appendChild(top);
 
     var replyLink = document.getElementById("replylink");
-    var uuid;
+    var auid = CLMARK.util.generateUUID('__clmarkauid__');
 
-    var postMessageRegExp = /^CLMARKUuid:/;
+    var postMessageRegExp = /^CLMARKUUID:/;
     var attachEventFn = window.addEventListener ? 'addEventListener' : 'attachEvent';
     window[attachEventFn](attachEventFn === 'attachEvent' ? 'onmessage' : 'message', function(e) {
         if (e && e.data && postMessageRegExp.test(e.data)) {
-            var uuid = (e.data || '').split(':')[1];
-            onUuid(uuid)
+            var parts = (e.data || '').split(':');
+            parts.shift();
+            onUuid(parts.join(':'));
         }
-    },false);
+    }, false);
 
+
+    var iframe = document.createElement('iframe');
+    iframe.id = 'CLMIframe';
+    iframe.frameBorder = 0;
+    iframe.scrolling = "no";
+    iframe.style.height = "0";
+    iframe.style.width = "0";
+    iframe.src = API_HOST + '/public/cookie.html';
+    body.appendChild(iframe);
+
+    var uuid;
     function onUuid (_uuid) {
         uuid = _uuid;
-
-        console.log("uuid", uuid);
-
-        if (/^\/search/.test(location.pathname)) {
-            route = "multiple"
-        } else if (replyLink) {
-            route = "single";
-        }
-        switch (route) {
-            case "multiple":
-                multiple = true;
-                onMultiple();
-                break;
-            case "single":
-                single = true;
-                onSingle();
-                break;
-        }
+        view.set('uuid', uuid);
     }
+
+    if (/^\/search/.test(location.pathname)) {
+        route = "multiple"
+    } else if (replyLink) {
+        route = "single";
+    }
+    switch (route) {
+        case "multiple":
+            multiple = true;
+            onMultiple();
+            break;
+        case "single":
+            single = true;
+            onSingle();
+            break;
+    }
+
 
     function onSingle () {
         var id = replyLink.pathname.split('/').pop();
@@ -56,6 +68,7 @@
                     MAX_INT: MAX_INT,
                     API_HOST: API_HOST,
                     uuid: uuid,
+                    auid: auid,
                     mode: 'single',
                     item: {
                         id: id,
@@ -64,7 +77,7 @@
                     }
                 },
                 oncomplete: function () {
-                    window['__clm__' + this.get('uuid')] = this.onCaptchaLoad.bind(this);
+                    window[this.get('auid')] = this.onCaptchaLoad.bind(this);
                     this.on({
                         onMarkAsSold: this.markAsSold.bind(this),
                         onUnmarkAsSold: this.unmarkAsSold.bind(this)
@@ -77,7 +90,9 @@
                     if (!window.grecaptcha) {
                         return;
                     }
+
                     this.set('checkingHuman', true);
+
                     var newCallback = function (captchaResponse) {
                         callback && callback(captchaResponse);
                         this.set('checkingHuman', false);
@@ -85,13 +100,17 @@
 
                     var response;
                     if (this._captchaWidgetId != null) {
-                        try {
-                            response = grecaptcha.getResponse(this._captchaWidgetId);
-                        } catch (e) {}
-                        if (response) {
-                            return newCallback(response);
-                        }
+                        grecaptcha.reset(this._captchaWidgetId);
+
+                        // can't verify twice: https://developers.google.com/recaptcha/docs/verify?hl=en
+                        //try {
+                        //    // response = grecaptcha.getResponse(this._captchaWidgetId);
+                        //} catch (e) {}
+                        //if (response) {
+                        //    return newCallback(response);
+                        //}
                     }
+
                     var catpchaEl = this.find('.captcha');
                     catpchaEl.innerHTML = '';
                     this._captchaWidgetId = grecaptcha.render(catpchaEl, {
@@ -122,21 +141,34 @@
     function onMultiple () {}
 
     function getItem (id, callback) {
-        request(API_HOST + '/' + id, {type: 'GET'}, function(data) {
-            data = JSON.parse(data || "{}");
-            callback && callback({remote: data, local: getLocalItem(id)});
+        request(API_HOST + '/' + id, {
+            type: 'GET',
+            success: function(data) {
+                data = JSON.parse(data || "{}");
+                callback && callback({remote: data, local: getLocalItem(id)});
+            },
+            error: function(err) {
+                console.error("[craigslist-mark] Something went wrong", err);
+            }
         });
     }
 
     function setItem (id, data, callback) {
-        request(API_HOST + '/' + id, {type: 'POST', data: data}, function(rdata) {
-            rdata = JSON.parse(rdata);
-            setLocalItem(id, {sold: data.sold});
-            callback && callback({remote: rdata, local: getLocalItem(id)});
+        request(API_HOST + '/' + id, {
+            type: 'POST',
+            data: data,
+            success: function(rdata) {
+                rdata = JSON.parse(rdata);
+                setLocalItem(id, {sold: data.sold});
+                callback && callback({remote: rdata, local: getLocalItem(id)});
+            },
+            error: function(err) {
+                console.error("[craigslist-mark] Something went wrong", err);
+            }
         });
     }
 
-    function request (url, options, callback) {
+    function request (url, options) {
         var xhr;
         if (window.ActiveXObject) {
             try {
@@ -149,7 +181,11 @@
         }
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
-                callback && callback(xhr.responseText);
+                if (xhr.status == 200) {
+                    options.success && options.success(xhr.responseText);
+                } else {
+                    options.error && options.error(xhr.responseText);
+                }
             }
         };
         xhr.open(options.type, url, true);

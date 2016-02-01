@@ -1,6 +1,6 @@
 {{#if mode == "single"}}
     <style>
-        #{{uuid}} {
+        #{{auid}} {
             display: block;
             clear: both;
             padding: 0;
@@ -10,33 +10,41 @@
             z-index: {{ MAX_INT }};
             color: red;
         }
-        #{{uuid}} button.undo-btn {
+        #{{auid}} button.undo-btn {
             color: black;
         }
-        #{{uuid}} button.mark-sold-btn {
+        #{{auid}} button.mark-sold-btn {
             color: black;
         }
-        #{{uuid}} .captcha,
-        #{{uuid}} .captcha div {
+        #{{auid}} .captcha,
+        #{{auid}} .captcha div {
             margin: 0 auto;
         }
+        #{{auid}} .hidden {
+            display: none !important;
+        }
+        #{{auid}} img.loading {
+            vertical-align: middle;
+        }
     </style>
-    <iframe src="{{ API_HOST }}/public/cookie.html"></iframe>
-    <script src="https://www.google.com/recaptcha/api.js?onload=__clm__{{uuid}}&render=explicit" async defer></script>
-    <div id="{{ uuid }}">
+    <script src="https://www.google.com/recaptcha/api.js?onload={{auid}}&render=explicit" async defer></script>
+    <div id="{{ auid }}" data-uuid="{{ uuid }}">
 
         {{#if item.local.sold || item.remote.sold > 0}}
             <div>
                 {{#if item.local.sold}}
                     You {{ item.remote.sold > 1 ? 'and ' + ((item.remote.sold - 1) > 1 ? (item.remote.sold - 1) + ' others ': ' 1 other person ') : '' }}marked this item as sold.
-                    <button class="undo-btn" on-click="onUnmarkAsSold">Undo</button>
+                    <button class="undo-btn {{#unless uuid}}hidden{{/unless}}" {{#if checkingHuman}}disabled="true"{{/if}} on-click="onUnmarkAsSold">Undo</button>
+                    <img src="{{ API_HOST }}/public/loading.gif" class="loading {{#if uuid}}hidden{{/if}}" />
                 {{else}}
                     {{item.remote.sold > 1 ? item.remote.sold + ' people' : '1 person'}} marked this item as sold.
-                    <button class="mark-sold-btn" on-click="onMarkAsSold">Mark as sold</button>
+                    <button class="mark-sold-btn {{#unless uuid}}hidden{{/unless}}" {{#if checkingHuman}}disabled="true"{{/if}} on-click="onMarkAsSold">Mark as sold</button>
+                    <img src="{{ API_HOST }}/public/loading.gif" class="loading {{#if uuid}}hidden{{/if}}" />
                 {{/if}}
             </div>
          {{else}}
-            <button class="mark-sold-btn" on-click="onMarkAsSold">Mark as sold</button>
+            <button class="mark-sold-btn {{#unless uuid}}hidden{{/unless}}" {{#if checkingHuman}}disabled="true"{{/if}} on-click="onMarkAsSold">Mark as sold</button>
+            <img src="{{ API_HOST }}/public/loading.gif" class="loading {{#if uuid}}hidden{{/if}}" />
          {{/if}}
         <div class="captcha" style="{{#unless checkingHuman}}display: none;{{/unless}}"></div>
     </div>

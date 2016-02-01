@@ -8,12 +8,18 @@
 <script>
     (function() {
         CLMARK.util.ondomready(function() {
-            var ec = new evercookie();
+            var ec = new evercookie({
+                asseturi: '/public',
+                phpuri: '/.',
+                history: false
+            });
             var uuid;
+            var prefix = '___clmarkuuid____';
+            var regexp = new RegExp('^' + prefix);
             ec.get("uuid", function(best) {
-                uuid = best || CLMARK.util.generateUUID('u');
+                uuid = best && regexp.test(best) ? best : CLMARK.util.generateUUID(prefix);
                 ec.set("uuid", uuid);
-                window.parent.postMessage('CLMARKUuid:' + uuid, '*');
+                window.parent.postMessage('CLMARKUUID:' + uuid, '*');
             });
         });
     })();

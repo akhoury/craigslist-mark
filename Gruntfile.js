@@ -24,7 +24,7 @@ module.exports = function(grunt) {
             options: {
                 process: function (src) {
                     return grunt.template.process(src, {data: {
-                        api: process.env.NODE_CLM_HOST || '//localhost:3000',
+                        api: process.env.NODE_CLM_HOST || 'http://localhost:3000',
                         captchaSiteKey: process.env.NODE_CLM_CAPTCHA_SITE_KEY
                     }})
                 }
@@ -50,9 +50,13 @@ module.exports = function(grunt) {
         },
 
         copy: {
-            'client_unminified': {
+            'extension_unminified': {
                 src: 'build/extension.js',
                 dest: 'build/extension.min.js'
+            },
+            'util_unminified': {
+                src: 'src/client/util.js',
+                dest: 'build/util.min.js'
             },
             'extension_chrome': {
                 files: [{
@@ -70,20 +74,21 @@ module.exports = function(grunt) {
                 src: 'src/client/site.html',
                 dest: 'build/index.html'
             },
-            evercookie: {
+            assets: {
                 expand: true,
                 flatten: true,
                 src: [
                     'src/client/external/swfobject-2.2.min.js',
                     'src/client/external/evercookie.js',
-                    'src/client/cookie.html'
+                    'src/client/cookie.html',
+                    'src/client/loading.gif'
                 ],
                 dest: 'build/'
             }
         },
 
         watch: {
-            files: ['<%= concat.main.src %>', 'src/client/site.html'],
+            files: ['<%= concat.main.src %>', 'src/client/*.html', 'src/client/*.mustache'],
             tasks: ['dev']
         }
     });
@@ -106,18 +111,18 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks("grunt-contrib-copy");
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-compress');
 
     grunt.registerTask('dev', [
         'clean:main',
         'ractiveparse',
         'concat',
-        'copy:client_unminified',
+        'copy:extension_unminified',
+        'copy:util_unminified',
         'copy:extension_chrome',
         'copy:extension_chrome_client',
         'build_extension_chrome',
         'copy:site',
-        'copy:evercookie'
+        'copy:assets'
     ]);
     grunt.registerTask('default', [
         'clean:main',
@@ -128,7 +133,7 @@ module.exports = function(grunt) {
         'copy:extension_chrome_client',
         'build_extension_chrome',
         'copy:site',
-        'copy:evercookie',
+        'copy:assets',
         'clean:after'
     ]);
 };

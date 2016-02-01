@@ -5,7 +5,7 @@ this["CLMARK"]["templates"]["main"] = this["CLMARK"]["templates"]["main"] || {};
 var templates = {
 
 		templates: {		
-			'extension': {"v":1,"t":[{"t":4,"n":50,"x":{"r":["mode"],"s":"_0==\"single\""},"f":[{"t":7,"e":"style","f":["#",{"t":2,"r":"uuid"}," {\n            display: block;\n            clear: both;\n            padding: 0;\n            margin: 0;\n            font-size: 10px;\n            text-align: center;\n            z-index: ",{"t":2,"r":"MAX_INT"},";\n            color: red;\n        }\n        #",{"t":2,"r":"uuid"}," button.undo-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"uuid"}," button.mark-sold-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"uuid"}," .captcha,\n        #",{"t":2,"r":"uuid"}," .captcha div {\n            margin: 0 auto;\n        }"]}," ",{"t":7,"e":"iframe","a":{"src":[{"t":2,"r":"API_HOST"},"/public/cookie.html"]}}," ",{"t":7,"e":"script","a":{"src":["https://www.google.com/recaptcha/api.js?onload=__clm__",{"t":2,"r":"uuid"},"&render=explicit"],"async":0,"defer":0}}," ",{"t":7,"e":"div","a":{"id":[{"t":2,"r":"uuid"}]},"f":[{"t":4,"n":50,"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"},"f":[{"t":7,"e":"div","f":[{"t":4,"n":50,"r":"item.local.sold","f":["You ",{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?\"and \"+((_0-1)>1?(_0-1)+\" others \":\" 1 other person \"):\"\""}},"marked this item as sold. ",{"t":7,"e":"button","a":{"class":"undo-btn"},"v":{"click":"onUnmarkAsSold"},"f":["Undo"]}]},{"t":4,"n":51,"f":[{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?_0+\" people\":\"1 person\""}}," marked this item as sold. ",{"t":7,"e":"button","a":{"class":"mark-sold-btn"},"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"r":"item.local.sold"}]}]},{"t":4,"n":51,"f":[{"t":7,"e":"button","a":{"class":"mark-sold-btn"},"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}],"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"}}," ",{"t":7,"e":"div","a":{"class":"captcha","style":[{"t":4,"n":51,"r":"checkingHuman","f":["display: none;"]}]}}]}]}]}
+			'extension': {"v":1,"t":[{"t":4,"n":50,"x":{"r":["mode"],"s":"_0==\"single\""},"f":[{"t":7,"e":"style","f":["#",{"t":2,"r":"auid"}," {\n            display: block;\n            clear: both;\n            padding: 0;\n            margin: 0;\n            font-size: 10px;\n            text-align: center;\n            z-index: ",{"t":2,"r":"MAX_INT"},";\n            color: red;\n        }\n        #",{"t":2,"r":"auid"}," button.undo-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"auid"}," button.mark-sold-btn {\n            color: black;\n        }\n        #",{"t":2,"r":"auid"}," .captcha,\n        #",{"t":2,"r":"auid"}," .captcha div {\n            margin: 0 auto;\n        }\n        #",{"t":2,"r":"auid"}," .hidden {\n            display: none !important;\n        }\n        #",{"t":2,"r":"auid"}," img.loading {\n            vertical-align: middle;\n        }"]}," ",{"t":7,"e":"script","a":{"src":["https://www.google.com/recaptcha/api.js?onload=",{"t":2,"r":"auid"},"&render=explicit"],"async":0,"defer":0}}," ",{"t":7,"e":"div","a":{"id":[{"t":2,"r":"auid"}],"data-uuid":[{"t":2,"r":"uuid"}]},"f":[{"t":4,"n":50,"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"},"f":[{"t":7,"e":"div","f":[{"t":4,"n":50,"r":"item.local.sold","f":["You ",{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?\"and \"+((_0-1)>1?(_0-1)+\" others \":\" 1 other person \"):\"\""}},"marked this item as sold. ",{"t":7,"e":"button","a":{"class":["undo-btn ",{"t":4,"n":51,"r":"uuid","f":["hidden"]}]},"m":[{"t":4,"n":50,"r":"checkingHuman","f":["disabled=\"true\""]}],"v":{"click":"onUnmarkAsSold"},"f":["Undo"]}," ",{"t":7,"e":"img","a":{"src":[{"t":2,"r":"API_HOST"},"/public/loading.gif"],"class":["loading ",{"t":4,"n":50,"r":"uuid","f":["hidden"]}]}}]},{"t":4,"n":51,"f":[{"t":2,"x":{"r":["item.remote.sold"],"s":"_0>1?_0+\" people\":\"1 person\""}}," marked this item as sold. ",{"t":7,"e":"button","a":{"class":["mark-sold-btn ",{"t":4,"n":51,"r":"uuid","f":["hidden"]}]},"m":[{"t":4,"n":50,"r":"checkingHuman","f":["disabled=\"true\""]}],"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}," ",{"t":7,"e":"img","a":{"src":[{"t":2,"r":"API_HOST"},"/public/loading.gif"],"class":["loading ",{"t":4,"n":50,"r":"uuid","f":["hidden"]}]}}],"r":"item.local.sold"}]}]},{"t":4,"n":51,"f":[{"t":7,"e":"button","a":{"class":["mark-sold-btn ",{"t":4,"n":51,"r":"uuid","f":["hidden"]}]},"m":[{"t":4,"n":50,"r":"checkingHuman","f":["disabled=\"true\""]}],"v":{"click":"onMarkAsSold"},"f":["Mark as sold"]}," ",{"t":7,"e":"img","a":{"src":[{"t":2,"r":"API_HOST"},"/public/loading.gif"],"class":["loading ",{"t":4,"n":50,"r":"uuid","f":["hidden"]}]}}],"x":{"r":["item.local.sold","item.remote.sold"],"s":"_0||_1>0"}}," ",{"t":7,"e":"div","a":{"class":"captcha","style":[{"t":4,"n":51,"r":"checkingHuman","f":["display: none;"]}]}}]}]}]}
 		}
 
 	};
@@ -14800,7 +14800,7 @@ var templates = {
     var multiple;
     var single;
     var body = document.body;
-    var API_HOST = '//localhost:3000';
+    var API_HOST = 'http://localhost:3000';
     var MAX_INT = -1 >>> 1;
     var view;
 
@@ -14809,38 +14809,50 @@ var templates = {
     header.appendChild(top);
 
     var replyLink = document.getElementById("replylink");
-    var uuid;
+    var auid = CLMARK.util.generateUUID('__clmarkauid__');
 
-    var postMessageRegExp = /^CLMARKUuid:/;
+    var postMessageRegExp = /^CLMARKUUID:/;
     var attachEventFn = window.addEventListener ? 'addEventListener' : 'attachEvent';
     window[attachEventFn](attachEventFn === 'attachEvent' ? 'onmessage' : 'message', function(e) {
         if (e && e.data && postMessageRegExp.test(e.data)) {
-            var uuid = (e.data || '').split(':')[1];
-            onUuid(uuid)
+            var parts = (e.data || '').split(':');
+            parts.shift();
+            onUuid(parts.join(':'));
         }
-    },false);
+    }, false);
 
+
+    var iframe = document.createElement('iframe');
+    iframe.id = 'CLMIframe';
+    iframe.frameBorder = 0;
+    iframe.scrolling = "no";
+    iframe.style.height = "0";
+    iframe.style.width = "0";
+    iframe.src = API_HOST + '/public/cookie.html';
+    body.appendChild(iframe);
+
+    var uuid;
     function onUuid (_uuid) {
         uuid = _uuid;
-
-        console.log("uuid", uuid);
-
-        if (/^\/search/.test(location.pathname)) {
-            route = "multiple"
-        } else if (replyLink) {
-            route = "single";
-        }
-        switch (route) {
-            case "multiple":
-                multiple = true;
-                onMultiple();
-                break;
-            case "single":
-                single = true;
-                onSingle();
-                break;
-        }
+        view.set('uuid', uuid);
     }
+
+    if (/^\/search/.test(location.pathname)) {
+        route = "multiple"
+    } else if (replyLink) {
+        route = "single";
+    }
+    switch (route) {
+        case "multiple":
+            multiple = true;
+            onMultiple();
+            break;
+        case "single":
+            single = true;
+            onSingle();
+            break;
+    }
+
 
     function onSingle () {
         var id = replyLink.pathname.split('/').pop();
@@ -14852,6 +14864,7 @@ var templates = {
                     MAX_INT: MAX_INT,
                     API_HOST: API_HOST,
                     uuid: uuid,
+                    auid: auid,
                     mode: 'single',
                     item: {
                         id: id,
@@ -14860,7 +14873,7 @@ var templates = {
                     }
                 },
                 oncomplete: function () {
-                    window['__clm__' + this.get('uuid')] = this.onCaptchaLoad.bind(this);
+                    window[this.get('auid')] = this.onCaptchaLoad.bind(this);
                     this.on({
                         onMarkAsSold: this.markAsSold.bind(this),
                         onUnmarkAsSold: this.unmarkAsSold.bind(this)
@@ -14873,7 +14886,9 @@ var templates = {
                     if (!window.grecaptcha) {
                         return;
                     }
+
                     this.set('checkingHuman', true);
+
                     var newCallback = function (captchaResponse) {
                         callback && callback(captchaResponse);
                         this.set('checkingHuman', false);
@@ -14881,13 +14896,17 @@ var templates = {
 
                     var response;
                     if (this._captchaWidgetId != null) {
-                        try {
-                            response = grecaptcha.getResponse(this._captchaWidgetId);
-                        } catch (e) {}
-                        if (response) {
-                            return newCallback(response);
-                        }
+                        grecaptcha.reset(this._captchaWidgetId);
+
+                        // can't verify twice: https://developers.google.com/recaptcha/docs/verify?hl=en
+                        //try {
+                        //    // response = grecaptcha.getResponse(this._captchaWidgetId);
+                        //} catch (e) {}
+                        //if (response) {
+                        //    return newCallback(response);
+                        //}
                     }
+
                     var catpchaEl = this.find('.captcha');
                     catpchaEl.innerHTML = '';
                     this._captchaWidgetId = grecaptcha.render(catpchaEl, {
@@ -14918,21 +14937,34 @@ var templates = {
     function onMultiple () {}
 
     function getItem (id, callback) {
-        request(API_HOST + '/' + id, {type: 'GET'}, function(data) {
-            data = JSON.parse(data || "{}");
-            callback && callback({remote: data, local: getLocalItem(id)});
+        request(API_HOST + '/' + id, {
+            type: 'GET',
+            success: function(data) {
+                data = JSON.parse(data || "{}");
+                callback && callback({remote: data, local: getLocalItem(id)});
+            },
+            error: function(err) {
+                console.error("[craigslist-mark] Something went wrong", err);
+            }
         });
     }
 
     function setItem (id, data, callback) {
-        request(API_HOST + '/' + id, {type: 'POST', data: data}, function(rdata) {
-            rdata = JSON.parse(rdata);
-            setLocalItem(id, {sold: data.sold});
-            callback && callback({remote: rdata, local: getLocalItem(id)});
+        request(API_HOST + '/' + id, {
+            type: 'POST',
+            data: data,
+            success: function(rdata) {
+                rdata = JSON.parse(rdata);
+                setLocalItem(id, {sold: data.sold});
+                callback && callback({remote: rdata, local: getLocalItem(id)});
+            },
+            error: function(err) {
+                console.error("[craigslist-mark] Something went wrong", err);
+            }
         });
     }
 
-    function request (url, options, callback) {
+    function request (url, options) {
         var xhr;
         if (window.ActiveXObject) {
             try {
@@ -14945,7 +14977,11 @@ var templates = {
         }
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4) {
-                callback && callback(xhr.responseText);
+                if (xhr.status == 200) {
+                    options.success && options.success(xhr.responseText);
+                } else {
+                    options.error && options.error(xhr.responseText);
+                }
             }
         };
         xhr.open(options.type, url, true);
