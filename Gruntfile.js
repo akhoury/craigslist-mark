@@ -26,7 +26,7 @@ module.exports = function(grunt) {
                     return grunt.template.process(src, {data: {
                         api: process.env.NODE_CLM_HOST || 'http://localhost:3000',
                         captchaSiteKey: process.env.NODE_CLM_CAPTCHA_SITE_KEY
-                    }})
+                    }});
                 }
             },
             main: {
@@ -77,6 +77,13 @@ module.exports = function(grunt) {
             assets: {
                 expand: true,
                 flatten: true,
+                options: {
+                    process: function (src, filepath) {
+                        return grunt.template.process(src, {data: {
+                            gaTrackingId: process.env.NODE_CLM_GA_TRACKING_ID
+                        }});
+                    }
+                },
                 src: [
                     'src/client/external/swfobject-2.2.min.js',
                     'src/client/external/evercookie.js',

@@ -58,6 +58,7 @@ NODE_CLM_CAPTCHA_SITE_KEY=your_captcha_public_key NODE_CLM_HOST=http://localhost
 
 * `NODE_CLM_CAPTCHA_SITE_KEY`, that's the public key (aka site key), get it from here: https://www.google.com/recaptcha/
 * `NODE_CLM_HOST`, server domain name with port, so the API urls would point at.
+* `NODE_CLM_GA_TRACKING_ID`, GA tracking id, get one from https://analytics.google.com
 
 
 ### run the server

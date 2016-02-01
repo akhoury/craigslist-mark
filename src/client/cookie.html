@@ -4,6 +4,18 @@
     <script src="/public/swfobject-2.2.min.js"></script>
     <script src="/public/evercookie.js"></script>
     <script src="/public/util.min.js"></script>
+
+    <script>
+        var gaTrackingId = '<%= gaTrackingId %>';
+        if (gaTrackingId) {
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+            ga('create', gaTrackingId, 'auto');
+            ga('send', 'pageview');
+        }
+    </script>
+
 </head>
 <script>
     (function() {
@@ -13,13 +25,30 @@
                 phpuri: '/.',
                 history: false
             });
-            var uuid;
-            var prefix = '___clmarkuuid____';
-            var regexp = new RegExp('^' + prefix);
+
+            var UUID;
+            var uuidPrefix = '___clmarkuuid____';
+            var uuidRegExp = new RegExp('^' + uuidPrefix);
             ec.get("uuid", function(best) {
-                uuid = best && regexp.test(best) ? best : CLMARK.util.generateUUID(prefix);
-                ec.set("uuid", uuid);
-                window.parent.postMessage('CLMARKUUID:' + uuid, '*');
+                UUID = best && uuidRegExp.test(best) ? best : CLMARK.util.generateUUID(uuidPrefix);
+                ec.set("uuid", UUID);
+                window.parent.postMessage(postMessagePrefix + UUID, '*');
+            });
+
+            var postMessagePrefix = 'clmark:';
+            var postMessageRegExp = new RegExp('^' + postMessagePrefix);
+
+            CLMARK.util.addEventListener(window, 'message', function(e) {
+                if (e && e.data && postMessageRegExp.test(e.data)) {
+                    var parts = (e.data || '').split(':');
+                    var uuid = parts[1];
+                    var action = parts[2];
+                    var pid = parts[3];
+
+                    if (window.ga && uuid == UUID) {
+                        ga('send', 'event', 'CLMarks', action, 'uuid:' + uuid, pid);
+                    }
+                }
             });
         });
     })();

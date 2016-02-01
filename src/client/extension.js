@@ -1,11 +1,13 @@
 (function() {
+    var CLMARK = window.CLMARK;
+    var util = window.CLMARK.util;
+    var API_HOST = CLMARK.API_HOST = '<%= api %>';
+    var MAX_INT = CLMARK.MAX_INT = -1 >>> 1;
 
     var route;
     var multiple;
     var single;
     var body = document.body;
-    var API_HOST = '<%= api %>';
-    var MAX_INT = -1 >>> 1;
     var view;
 
     var top = document.createElement('div');
@@ -13,18 +15,19 @@
     header.appendChild(top);
 
     var replyLink = document.getElementById("replylink");
-    var auid = CLMARK.util.generateUUID('__clmarkauid__');
 
-    var postMessageRegExp = /^CLMARKUUID:/;
-    var attachEventFn = window.addEventListener ? 'addEventListener' : 'attachEvent';
-    window[attachEventFn](attachEventFn === 'attachEvent' ? 'onmessage' : 'message', function(e) {
-        if (e && e.data && postMessageRegExp.test(e.data)) {
+    var auidPrefix = '__clmarkauid__';
+    var auid = CLMARK.util.generateUUID(auidPrefix);
+    var postMessagePrefix = 'clmark:';
+    var postMessageRegExp = new RegExp('^' + postMessagePrefix);
+
+    var onMessage = function(e) {
+        if (!uuid && e && e.data && postMessageRegExp.test(e.data)) {
             var parts = (e.data || '').split(':');
-            parts.shift();
-            onUuid(parts.join(':'));
+            onUuid(parts[1]);
         }
-    }, false);
-
+    };
+    util.addEventListener(window, 'message', onMessage);
 
     var iframe = document.createElement('iframe');
     iframe.id = 'CLMIframe';
@@ -34,6 +37,7 @@
     iframe.style.width = "0";
     iframe.src = API_HOST + '/public/cookie.html';
     body.appendChild(iframe);
+    var iframeWindow = iframe.contentWindow;
 
     var uuid;
     function onUuid (_uuid) {
@@ -123,6 +127,8 @@
                     this.isHuman(function(captchaResponse) {
                         setItem(this.get('item.id'), {sold: true, captchaResponse: captchaResponse}, function(data) {
                             this.set({'item.local': data.local, 'item.remote': data.remote});
+
+                            iframeWindow.postMessage('clmark:' + this.get('uuid') + ':markedSold:' + this.get('item.id'), '*');
                         }.bind(this));
                     }.bind(this));
                 },
@@ -131,6 +137,8 @@
                     this.isHuman(function(captchaResponse) {
                         setItem(this.get('item.id'), {sold: false, captchaResponse: captchaResponse}, function(data) {
                             this.set({'item.local': data.local, 'item.remote': data.remote});
+
+                            iframeWindow.postMessage('clmark:' + this.get('uuid') + ':unmarkedSold:' + this.get('item.id'), '*');
                         }.bind(this));
                     }.bind(this));
                 }
@@ -141,11 +149,11 @@
     function onMultiple () {}
 
     function getItem (id, callback) {
-        request(API_HOST + '/' + id, {
+        util.request(API_HOST + '/' + id, {
             type: 'GET',
             success: function(data) {
                 data = JSON.parse(data || "{}");
-                callback && callback({remote: data, local: getLocalItem(id)});
+                callback && callback({remote: data, local: util.getLocalItem(id)});
             },
             error: function(err) {
                 console.error("[craigslist-mark] Something went wrong", err);
@@ -154,13 +162,13 @@
     }
 
     function setItem (id, data, callback) {
-        request(API_HOST + '/' + id, {
+        util.request(API_HOST + '/' + id, {
             type: 'POST',
             data: data,
             success: function(rdata) {
                 rdata = JSON.parse(rdata);
-                setLocalItem(id, {sold: data.sold});
-                callback && callback({remote: rdata, local: getLocalItem(id)});
+                util.setLocalItem(id, {sold: data.sold});
+                callback && callback({remote: rdata, local: util.getLocalItem(id)});
             },
             error: function(err) {
                 console.error("[craigslist-mark] Something went wrong", err);
@@ -168,59 +176,4 @@
         });
     }
 
-    function request (url, options) {
-        var xhr;
-        if (window.ActiveXObject) {
-            try {
-                xhr = new ActiveXObject("Microsoft.XMLHTTP");
-            } catch(e) {
-                throw e;
-            }
-        } else {
-            xhr = new XMLHttpRequest();
-        }
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status == 200) {
-                    options.success && options.success(xhr.responseText);
-                } else {
-                    options.error && options.error(xhr.responseText);
-                }
-            }
-        };
-        xhr.open(options.type, url, true);
-        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xhr.send(options.data ? toParam(options.data) : undefined);
-
-    }
-
-    function toParam (hash) {
-        var str = "";
-        Object.keys(hash).forEach(function(k, i) {
-            str += (i ? '&' : '') + k + "=" + hash[k];
-        });
-        return str;
-    }
-
-    function getLocalItem (id) {
-        var data = {};
-        try {
-            data = JSON.parse(localStorage.getItem(API_HOST + '_' + id));
-        } catch (e) {}
-        return data;
-    }
-
-    function setLocalItem (id, data) {
-        localStorage.setItem(API_HOST + '_' + id, JSON.stringify(data));
-        return getLocalItem(id);
-    }
-
-    function generateUUID (prefix) {
-        /*! http://stackoverflow.com/a/2117523/369724 CC BY-SA 2.5 */
-        return (prefix + '') + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0,
-                    v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
-    }
 })();
